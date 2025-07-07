@@ -317,3 +317,16 @@ BOM : Browser Object Model, 브라우저 객체 모델
 	  web document가 element를 제외한 웹 브라우저 창에 포함된 객체 요소를 의미함 (window 속성에 속하고 document가 아닌 window를 제어)
 	  ... alert()은 window.alert() 중 window가 생략된 것
 	  window.location, window.onload 등..
+	  
+*** *** Model1 Architecture *** ***
+Software Architecture : 소프트웨어 설계양식
+	-> 소프트웨어의 전체 구조를 표현하며 소프트웨어 구성요소(component) 사이의 관계를 정의
+	
+	초기 웹 개발 방식 (1990 년대 후반 ~ 2000년대 초반)
+				jsp <----> Database
+		
+	Model1 Architecture (2000년대 초반 ~ 중반)
+jsp <---> java beans(Dao, Service 등) <---> Database
+
+	Model2 Architecture (2000년대 초중반 ~ )
+	
