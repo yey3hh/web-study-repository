@@ -348,7 +348,7 @@ model 2 MVC, MVC, Web MVC, MVC2 등으로 불림.
 
 Model : 데이터와 비즈니스 로직 담당
 View : 응답 전담(화면 표시 담당, Http Response Message를 전담)
-Controller : 요청 처리를 전담, Model과 Viewㄹㅡㄹ 제어
+Controller : 요청 처리를 전담, Model과 View를 제어
 			 상세 : 요청에 대한 분석, 분석에 따른 Model 연동
 			 	   연동 결과에 따른 View를 선택하고 이동방식 (forward or redirect)을 결정
 why? jsp가 view 역할을 담당할까?
@@ -359,6 +359,25 @@ why? jsp가 view 역할을 담당할까?
 	 													(그래서 스프링의 DispatcherServlet이 가장 중요한 Front Controller로 사용되고 있음)
 	Java component가 Model 역할을 할까?
 		-> 비즈니스 로직과 데이터 액세스 로직을 처리하기 가장 최적화 되어 있음
+		
+		
 	*** Controller에서 View로 제어를 이동하는 방식 ***
-	1. forward 방식
-	2. redirect 방식
+	1. forward 방식 : 웹 컨테이너 상에서 이동되는 방식
+					 request와 response가 유지, 정보 조회 용도에 적합(재요청시 재동작 되는 특성)
+	2. redirect 방식 : 클라이언트에게 응답 view url을 지정하는 방식, 기존 요청에 대한 응답으로 새로운 페이지 url을 명시하여 결과를 보는 방식
+					  기존 request와 response는 유지 되지 않음
+					  재 동작이 되지 않아야 하는 작업에 적합(회원가입, 로그인, 상품 등록 등..)
+	*** *** 상세 설명 *** ***
+	
+	- request.getRequestDispatcher(url).forward(reqset, response)
+	- response.sendRedirect(url) 
+	
+	특징
+		foward								redirect
+	서부 내부에서 동작						클라이언트 브라우가 동작
+	url 변경 X 							url 변경 O
+	요청 객체 유지	O						요청 객체 유지 X
+	웹 컨텍스트 경로 제외한 내부 경로(/)		웹 컨텍스트 경로 포함 절대/상대 경로
+	중복 동작(or 재동작) 가능				중복 동작 방지
+	브라우저에서는 단일 요청/응답으로 인식		재요청으로 인식
+	
