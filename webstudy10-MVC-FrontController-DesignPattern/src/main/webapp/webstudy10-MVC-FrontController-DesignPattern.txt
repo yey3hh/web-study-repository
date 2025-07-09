@@ -471,8 +471,7 @@ FrontController Ver1 : 기본 Front Controller -> 모든 클라이언트의 요�
 	}
 문제점 : 코드 비대화, 확장성 부족 (만약 새로운 업무 추가시 공통 코드를 계속 변경)
 
-FrontController Ver2 : 메서드 분리
-
+*** ** *** FrontController Ver2 : 메서드별로 역할을 분리, 단일 책임 원칙 *** ** ***
 doDispatch(HttpServletRequest request, HttpServletResponse response) {
 	if() {
 		findCustomerById(HttpServletRequest request, HttpServletResponse response)
@@ -486,34 +485,19 @@ findCustomerById(HttpServletRequest request, HttpServletResponse response) {
 registerCustomer(HttpServletRequest request, HttpServletResponse response) {
 }
 
-*** ** *** ver2 : 메서드별로 역할을 분리, 단일 책임 원칙 *** ** ***
-protected void findCustomerById(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// 클라이언트 요청 분석 : 클라이언트로부터 고객 아이디를 받아 온다.
-		String id = request.getParameter("customerId");
-		// MockDao와 연동
-		CustomerVo customer = MockDao.getInstance().findCustomerById(id);
-		// 고객이 존재하면 고객정보를 request에 공유하여 forward로 응답
-		if(customer != null) {
-			request.setAttribute("customer", customer);
-			request.getRequestDispatcher("findbyid-ok.jsp").forward(request, response);
-		} else {
-			// 고객이 존재하지 않으면 redirect 방식으로 응답
-			response.sendRedirect("findbyid-fail.jsp");
-		}
-	}
-	
-	protected void registerCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String id = request.getParameter("id");
-		String name = request.getParameter("name");
-		String address = request.getParameter("address");
-		CustomerVo customer = new CustomerVo(id, name, address);
-		
-		MockDao.getInstance().registerCustomer(customer);
-		
-		response.sendRedirect("register-result.jsp");
-	}
+Ver2의 개선점 : 메서드 별로 분리, 가독성이 향상. But, 여전히 한 클래스에 모든 로직이 있기에 업무 추가시 클래스가 비대해지고 관리가 어려움
 
+*** ** *** FrontController Ver3 : 클래스 분리 *** ** ***
 
+// 각 요청 처리 기능별 클래스로 분리
+FrontControllerServletVer3													class	FindCustomerController,	class	RegisterCustomerController
+doDispatch(HttpServletRequest request, HttpServletResponse response) {
+	if() {
+		FindCustomerController controller = new FindCustomerController();
+	} else if() {
+		RegisterCustomerController controller = new RegisterCustomerController();
+	}
+}
 
 
 
