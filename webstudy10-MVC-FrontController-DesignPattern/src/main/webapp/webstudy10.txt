@@ -419,14 +419,99 @@ JSP 페이지에서 JSTL 사용 선언부
 중요 포인트: 톰캣 10.1은 Jakarta EE 10을 기반으로 하므로 jakarta.tags.core 네임스페이스를 사용해야 함 
 
 
+*** ** *** ** *** webstudy10-MVC-FrontController-DesignPattern *** ** *** ** ***
 
+Front Controller Design Pattern
+ : 모든 클라이언트의 요청을 하나의 진입점으로 통합하여 처리하는 설계 패턴
+Design Pattern : 어떠한 문제에 대한 해결책을 재사용할 수 있도록 정형화 한 것
 
+실생활 예)
+호텔 프론트
+	- 모든 고객 요청이 프론트 데스크로 집중
+	- 전 층 어느 층이던 상관 없이 고객의 모든 요청들은 프론트로 오기 때문에 표준화가 됨
+	- 프론트 데스크에서 요청에 대한 적잘한 부서 또는 담당자로 연결
+	- 체크인, 홈서비스, 청소 등 각각 전담 부서 처리
 
+Front Controller가 없다면?
+문제 상황 : 각 기능마다 별도 입구를 찾아야 함
+	- 회원가입 -> RegisterMemberServlet
+	- 로그인 -> LoginServlet
+	- 로그아웃 -> LogoutServlet
+	- 상품조회 -> FindProductByIdServlet
+	- 주문처리 -> OrderProcessingServlet
+	등 등 사용자 측에 부담이 감
+	
+결과 : 
+	1. 프론트가 없다면 공통 처리 로직 중복 -> 보안, 로깅, 인코딩 등
+	2. 일관성 없는 처리 방식
+	3. 관리 포인트 급증 (이건 이렇게 하면 안되지! 저건 저렇게 해야지!)
+	4. 생산성 저하 및 유지 보수의 어려움
 
+공항 검색대도 동일 - 보안이 중요하기에 어느 나라로 출국하는지와 상관 없이 한 곳에서 검사를 진행
 
+Front Controller Design Pattern 도입 후
+위 문제의 해결책 : 모든 요청을 하나의 입구로 처리
 
+장점 : 공통 로직의 중앙화 (보안, 로깅, 예외 처리 등)
+	  일관된 요청 처리 흐름
+	  관리 포인트 단일화
+	  확장성과 유지보수성 향상
+	  표준화가 되어있기 때문에 새로운 요청이 들어와도 한 곳에서 처리 가능
+	  
+Spring과 연관성 : Spring MVC의 DispatcherServlet이 Front Controller Pattern이 적용된 Front Controller 역할을 함
 
+FrontController Ver1 : 기본 Front Controller -> 모든 클라이언트의 요청을 하나의 진입점으로 모았음
+// 모든 로직이 doDispatch에 집중
+	doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		if (requestType != null && requestType.equals("findbyid")) {
+			// 직접 요청 처리 (비즈니스 처리)
+		} else if (requestType != null && requestType.equals("registerCustomer")) {
+			// 직접 요청 처리 (비즈니스 처리)
+		}
+	}
+문제점 : 코드 비대화, 확장성 부족 (만약 새로운 업무 추가시 공통 코드를 계속 변경)
 
+FrontController Ver2 : 메서드 분리
+
+doDispatch(HttpServletRequest request, HttpServletResponse response) {
+	if() {
+		findCustomerById(HttpServletRequest request, HttpServletResponse response)
+	} else if() {
+		registerCustomer(HttpServletRequest request, HttpServletResponse response)
+	}
+}
+
+findCustomerById(HttpServletRequest request, HttpServletResponse response) {
+}
+registerCustomer(HttpServletRequest request, HttpServletResponse response) {
+}
+
+*** ** *** ver2 : 메서드별로 역할을 분리, 단일 책임 원칙 *** ** ***
+protected void findCustomerById(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 클라이언트 요청 분석 : 클라이언트로부터 고객 아이디를 받아 온다.
+		String id = request.getParameter("customerId");
+		// MockDao와 연동
+		CustomerVo customer = MockDao.getInstance().findCustomerById(id);
+		// 고객이 존재하면 고객정보를 request에 공유하여 forward로 응답
+		if(customer != null) {
+			request.setAttribute("customer", customer);
+			request.getRequestDispatcher("findbyid-ok.jsp").forward(request, response);
+		} else {
+			// 고객이 존재하지 않으면 redirect 방식으로 응답
+			response.sendRedirect("findbyid-fail.jsp");
+		}
+	}
+	
+	protected void registerCustomer(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String id = request.getParameter("id");
+		String name = request.getParameter("name");
+		String address = request.getParameter("address");
+		CustomerVo customer = new CustomerVo(id, name, address);
+		
+		MockDao.getInstance().registerCustomer(customer);
+		
+		response.sendRedirect("register-result.jsp");
+	}
 
 
 
