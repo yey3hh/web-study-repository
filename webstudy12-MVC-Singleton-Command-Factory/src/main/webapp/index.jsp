@@ -9,7 +9,7 @@
 <body>
 	<h2>Web MVC 기반 Front Controller Design Pattern 적용</h2>
 	
-	<form action="FrontControllerServletVer4" method="get">
+	<form action="FrontControllerServletVer5" method="get">
 		<%-- 하나의 프론트 컨트롤러로 다양한 요청이 이루어지므로 어떤 요청인지를 hidden으로 알려준다 --%>
 		<input type="hidden" name="command" value="findbyid">
 		<input type="text" name="customerId" required="required" placeholder="고객 아이디">
@@ -19,18 +19,27 @@
 	<br><br>
 	<%-- 
 		다양한 요청을 Front로. 즉, 하나의 진입점에서 처리하도록 한다.
-		index -- 고객 등록 요청 -- FrontControllerServlet 				Controller
-									doDispatch()						|	--------------------- MockDao
-									 |									|
-									 |
+		index -- 고객 등록 요청 -- FrontControllerServlet 	--- HandlerMapping		Controller
+								doDispatch()										|	--------------------- MockDao
+									 |												|
+								 |											RegisterCustomerController
 									 register-result.jsp로 리다이렉트
 	--%>
-	<form action="FrontControllerServletVer4" method="post">
+	<form action="FrontControllerServletVer5" method="post">
 		<input type="hidden" name="command" value="registerCustomer"><br>
 		<input type="text" name="id" placeholder="아이디" required="required"><br>
 		<input type="text" name="name" placeholder="이름" required="required"><br>
 		<input type="text" name="address" placeholder="주소" required="required"><br>
 		<button type="submit">고객 등록</button>
+	</form>
+	<br><br>
+	
+	<form action="FrontControllerServletVer5" method="post">
+		<input type="hidden" name="command" value="updateCustomer"><br>
+		<input type="text" name="id" placeholder="아이디" required="required"><br>
+		<input type="text" name="name" placeholder="이름" required="required"><br>
+		<input type="text" name="address" placeholder="주소" required="required"><br>
+		<button type="submit">고객 수정</button>
 	</form>
 	<br><br>
 	
