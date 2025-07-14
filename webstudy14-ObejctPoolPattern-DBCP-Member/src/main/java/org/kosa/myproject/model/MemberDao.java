@@ -22,6 +22,33 @@ public class MemberDao {
 		return instance;
 	}
 	
+	public MemberVo login(String id, String password) throws SQLException {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		MemberVo vo = null;
+		
+		try {
+			con = this.dataSource.getConnection();
+			String sql = "SELECT id, password, name, address FROM member WHERE id = ? AND password = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, password);
+			
+			rs = pstmt.executeQuery();
+			
+			if (rs.next()) {
+				vo = new MemberVo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4));
+			}
+			
+		} finally {
+			closeAll(rs, pstmt, con);
+		}
+		
+		return vo;
+	}
+	
 	public int getTotalMemberCount() throws SQLException {
 		int totalCount = 0;
 		
